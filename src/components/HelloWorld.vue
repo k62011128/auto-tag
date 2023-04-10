@@ -9,6 +9,9 @@
 <script lang="ts">
 import Vue from 'vue';
 import mammoth from 'mammoth';
+import FileSaver from 'file-saver'
+// @ts-ignore
+import htmlDocx from 'html-docx-js/dist/html-docx'
 
 export default Vue.extend({
   name: 'HelloWorld',
@@ -36,20 +39,21 @@ export default Vue.extend({
         mammoth.convertToHtml({ arrayBuffer: arrayBuffer }).then(_this.displayResult, function(error) {
           console.error(error);
         });
-
       }
     },
-
     displayResult(result:any):any{
       let htmlValue = result.value
-      // this.$refs.docContainer=htmlValue
       this.html=htmlValue
     },
     handleInput(event:any) {
       this.html = event.target.innerHTML
     },
     exportDocx() {
-
+      // console.log('export')
+      const html = this.html
+      const blob:any = htmlDocx.asBlob(html);
+      // console.log(blob)
+      FileSaver.saveAs(blob, `新建文档.docx`)
     },
   }
 });

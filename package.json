@@ -11,6 +11,8 @@
     "argparse": "~1.0.3",
     "bluebird": "~3.4.0",
     "dingbat-to-unicode": "^1.0.1",
+    "file-saver": "^2.0.5",
+    "html-docx-js": "^0.3.1",
     "jszip": "^3.7.1",
     "lop": "^0.4.1",
     "mammoth": "^1.5.1",
@@ -23,6 +25,8 @@
     "xmlbuilder": "^10.0.0"
   },
   "devDependencies": {
+    "@types/file-saver": "^2.0.5",
+    "@types/html-docx-js": "^0.3.1",
     "@vue/cli-plugin-typescript": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
     "polyfill-library": "^4.7.0",

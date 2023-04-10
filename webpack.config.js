@@ -3,18 +3,17 @@
 const webpack = require('webpack')
 module.exports = {
     // ...
-    // resolve: {
-    //     fallback: {
-    //         path,
-    //         util
-    //     },
-    //     alias: {
-    //         'polyfill-library': 'polyfill-library/dist/polyfill.min.js'
-    //     },
-    //     fallback: {
-    //         process: require.resolve('process/browser'),
-    //     }
-    // },
+    resolve: {
+        fallback: {
+            "fs": false
+        },
+        // alias: {
+        //     'polyfill-library': 'polyfill-library/dist/polyfill.min.js'
+        // },
+        // fallback: {
+        //     process: require.resolve('process/browser'),
+        // }
+    },
     plugins: [
         // new webpack.DefinePlugin({ // webpack自带该插件，无需单独安装
         //     'process.env' : {
