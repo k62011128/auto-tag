@@ -7,11 +7,26 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
-    "vue": "^2.6.14"
+    "@xmldom/xmldom": "^0.8.6",
+    "argparse": "~1.0.3",
+    "bluebird": "~3.4.0",
+    "dingbat-to-unicode": "^1.0.1",
+    "jszip": "^3.7.1",
+    "lop": "^0.4.1",
+    "mammoth": "^1.5.1",
+    "path": "^0.12.7",
+    "path-is-absolute": "^1.0.0",
+    "underscore": "^1.13.1",
+    "util": "^0.12.5",
+    "vue": "^2.6.14",
+    "webpack": "^5.78.0",
+    "xmlbuilder": "^10.0.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-typescript": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
+    "polyfill-library": "^4.7.0",
+    "process": "^0.11.10",
     "typescript": "~4.5.5",
     "vue-template-compiler": "^2.6.14"
   }
