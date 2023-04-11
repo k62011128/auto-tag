@@ -7,6 +7,8 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "@wangeditor/editor": "^5.1.23",
+    "@wangeditor/editor-for-vue": "^1.0.2",
     "@xmldom/xmldom": "^0.8.6",
     "argparse": "~1.0.3",
     "bluebird": "~3.4.0",
