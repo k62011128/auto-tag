@@ -24,6 +24,9 @@ import mammoth, {convertToHtml} from "mammoth";
 import htmlDocx from 'html-docx-js/dist/html-docx'
 import * as docx from 'docx-preview'
 import {getCursorPosition, setCursorPosition, setIxbrlTag, getNextTextNode, getTextNodes, HtmlTag} from "@/utils/tools";
+import Docxtemplater from 'docxtemplater';
+// import JSZipUtils from 'jszip-utils';
+import JSZip from 'jszip';
 
 export default Vue.extend({
   name: 'HelloWorld',
@@ -181,6 +184,7 @@ export default Vue.extend({
         this.optionsHandle[0](item)
       })
       htmlString = htmlDoc.body.innerHTML
+      // return
       const blob: any = htmlDocx.asBlob(htmlString);
       FileSaver.saveAs(blob, `新建文档.docx`)
     },
