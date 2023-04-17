@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <HelloWorld width="500px" height="500px"/>
+    <HelloWorld width="100%" height="500px"/>
 <!--    <Editor></Editor>-->
   </div>
 </template>
