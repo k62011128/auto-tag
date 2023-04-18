@@ -56,7 +56,7 @@ export default Vue.extend({
         const textNode = document.createTextNode(span.textContent);
         span.parentNode.replaceChild(textNode, span);
       }],
-      currentDocument:null as any
+      currentDocument: null as any
     };
   },
   methods: {
@@ -64,56 +64,69 @@ export default Vue.extend({
       const file = e.target.files[0]
       this.currentDocument = file;
     },
-    importDocx(){
+    importDocx() {
       const _this: any = this
-      let reader = new FileReader()
-      reader.readAsArrayBuffer(this.currentDocument)
-      reader.onload = function (evt: any) {
-        let arrayBuffer = evt.target.result
-        mammoth.convertToHtml({arrayBuffer: arrayBuffer}).then(_this.displayResult, function (error) {
-          console.log('error',error);
-        }).then(_this.setEventListener)
-      }
+      // let reader = new FileReader()
+      // reader.readAsArrayBuffer(this.currentDocument)
+      // reader.onload = function (evt: any) {
+      //   let arrayBuffer = evt.target.result
+      //   mammoth.convertToHtml({arrayBuffer: arrayBuffer}).then(_this.displayResult, function (error) {
+      //     console.log('error',error);
+      //   }).then(_this.setEventListener)
+      // }
       // return
-      // const docxOptions = Object.assign(docx.defaultOptions, {
-      //   className: "docx", //class name/prefix for default and document style classes
-      //   inWrapper: true, //enables rendering of wrapper around document content
-      //   ignoreWidth:  false, //disables rendering width of page
-      //   ignoreHeight:  false, //disables rendering height of page
-      //   ignoreFonts: false, //disables fonts rendering
-      //   breakPages: true, //enables page breaking on page breaks
-      //   ignoreLastRenderedPageBreak:  true, //disables page breaking on lastRenderedPageBreak elements
-      //   experimental: false, //enables experimental features (tab stops calculation)
-      //   trimXmlDeclaration: true, //if true, xml declaration will be removed from xml documents before parsing
-      //   useBase64URL: false, //if true, images, fonts, etc. will be converted to base 64 URL, otherwise URL.createObjectURL is used
-      //   useMathMLPolyfill: false, //includes MathML polyfills for chrome, edge, etc.
-      //   showChanges: false, //enables experimental rendering of document changes (inserions/deletions)
-      //   debug:  true, //enables additional logging
-      // });
-      // const container:any = document.querySelector("#doc-input");
-      // if(!this.currentDocument)
-      //   return
-      // docx.renderAsync(this.currentDocument, container,undefined,docxOptions)
-      //     .then((x) => {
-      //       // renderThumbnails(container, document.querySelector("#thumbnails-container"));
-      //       console.log('ok');
-      //       this.displayResult()
-      //     }).then(_this.setEventListener);
+      const docxOptions = Object.assign(docx.defaultOptions, {
+        className: "docx", //class name/prefix for default and document style classes
+        inWrapper: true, //enables rendering of wrapper around document content
+        ignoreWidth: false, //disables rendering width of page
+        ignoreHeight: false, //disables rendering height of page
+        ignoreFonts: false, //disables fonts rendering
+        breakPages: true, //enables page breaking on page breaks
+        ignoreLastRenderedPageBreak: true, //disables page breaking on lastRenderedPageBreak elements
+        experimental: false, //enables experimental features (tab stops calculation)
+        trimXmlDeclaration: true, //if true, xml declaration will be removed from xml documents before parsing
+        useBase64URL: false, //if true, images, fonts, etc. will be converted to base 64 URL, otherwise URL.createObjectURL is used
+        useMathMLPolyfill: false, //includes MathML polyfills for chrome, edge, etc.
+        showChanges: false, //enables experimental rendering of document changes (inserions/deletions)
+        debug: true, //enables additional logging
+      });
+      const container: any = document.querySelector("#doc-input");
+      if (!this.currentDocument)
+        return
+      docx.renderAsync(this.currentDocument, container, undefined, docxOptions)
+          .then((x) => {
+            // renderThumbnails(container, document.querySelector("#thumbnails-container"));
+            console.log('ok');
+            this.displayResult()
+          }).then(_this.setEventListener);
     },
-    displayResult(result:any): any {
+    displayResult(): any {
+      // let articleBox:any = new HtmlTag('div',{},document.querySelector('section.docx')?.innerHTML)
+      let articleBox:any = document.querySelector('section.docx')?.innerHTML
+      if (!articleBox)
+        return
+      // const serializer = new XMLSerializer();
+      // const articleContent = serializer.serializeToString(article);
+      let htmlString:any = articleBox
+      // console.log(htmlString)
       // return
-      // let _this=this
-      // let bar:any=this.$refs.optionsBar
-      let htmlString = result.value
       // console.log(document.querySelector('#doc-input'))
       // console.log(htmlString)
-      if(!htmlString)
+      if (!htmlString)
         return
       // console.log(typeof htmlString)//string
       // return
       // console.log(htmlValue)
       const parser = new DOMParser();
       const htmlDoc = parser.parseFromString(htmlString, 'text/html');
+      let spanArr=htmlDoc.querySelectorAll('span')
+      for(let i=0;i<spanArr.length;i++){
+        this.optionsHandle[0](spanArr[i])//把span全换成textNode
+      }
+      // console.log(htmlDoc)
+      htmlDoc.body.innerHTML=htmlDoc.body.innerHTML//连接连续的textNode
+      // console.log(htmlDoc.body)
+      // return
       let textNodes = getTextNodes(htmlDoc.body)
       // console.log(textNodes)
       textNodes.forEach((node: any) => {
@@ -147,11 +160,16 @@ export default Vue.extend({
           range.insertNode(span);
         }
       })
+      // console.log(htmlDoc.body)
+      // return
       htmlString = htmlDoc.body.innerHTML
       htmlString = htmlString.replace(/\(\{\(/g, '')
       htmlString = htmlString.replace(/\)\}\)\(ixbrlTag\)/g, '')
       // console.log(htmlString)
-      this.html = htmlString
+      let se:any=document.querySelector('section.docx')
+      se.innerHTML=htmlString
+      // console.log(htmlString)
+      // this.html = htmlString
     },
     setEventListener() {
       // return
@@ -174,8 +192,9 @@ export default Vue.extend({
 
     },
     exportDocx() {
-      let ed: any = this.$refs.editor
-      let htmlString = ed.innerHTML
+      let htmlString:any =document.querySelector('section.docx')?.innerHTML
+      if(!htmlString)
+        return
       const parser = new DOMParser();
       const htmlDoc = parser.parseFromString(htmlString, 'text/html');
       let arr: any = htmlDoc.querySelectorAll('.ixbrlTag')
@@ -184,7 +203,8 @@ export default Vue.extend({
         this.optionsHandle[0](item)
       })
       htmlString = htmlDoc.body.innerHTML
-      // return
+      // console.log(htmlDoc.body)
+      return
       const blob: any = htmlDocx.asBlob(htmlString);
       FileSaver.saveAs(blob, `新建文档.docx`)
     },
@@ -265,9 +285,11 @@ export default Vue.extend({
   display: flex;
   flex-direction: column;
 }
-section.docx{
+
+section.docx {
   margin: auto;
 }
+
 .ixbrl-editor-header-wrapper {
   width: 100%;
   height: auto;
@@ -282,6 +304,7 @@ section.docx{
 
 .ixbrlTag {
   cursor: pointer;
+  font-family: auto !important;
 }
 
 #ixbrlTagOptionsBar {
