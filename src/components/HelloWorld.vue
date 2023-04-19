@@ -1,13 +1,15 @@
 <template>
-  <div :style="{ width: width, height: height }" class="ixbrl-editor-wrapper">
+  <div :style="{ width: width, height: height ,maxHeight:mxHeight}" class="ixbrl-editor-wrapper">
     <div class="ixbrl-editor-header-wrapper">
       <input type="file" ref="fileInput" @change="handleFileSelect" accept=".docx"/>
       <button @click="importDocx">导入</button>
       <button @click="exportDocx">导出</button>
       <button @click="markIxbrl">markIxbrl</button>
-      <input :value="inputValue" @input="updateValue"></input>
+      <input :value="inputValue" @input="updateValue">
     </div>
-    <div v-html="html" ref="editor" id="doc-input" contenteditable="true" @input="handleInput"></div>
+    <div class="ixbrl-editor-content-wrapper">
+      <div v-html="html" ref="editor" id="doc-input" contenteditable="true" @input="handleInput"></div>
+    </div>
     <!--    <div v-html="html" ref="editor" id="doc-input" @input="handleInput"></div>-->
     <div id="ixbrlTagOptionsBar" v-show="isIxbrlTagOptionsBarVisible" ref="optionsBar">
       <div class="ixbrlTagOption" @click="handleByOptions(0)">
@@ -19,16 +21,10 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import FileSaver from 'file-saver'
-import mammoth, {convertToHtml} from "mammoth";
 // @ts-ignore
 import htmlDocx from 'html-docx-js/dist/html-docx'
 import * as docx from 'docx-preview'
-import {getCursorPosition, setCursorPosition, setIxbrlTag, getNextTextNode, getTextNodes, HtmlTag} from "@/utils/tools";
-import Docxtemplater from 'docxtemplater';
-// import JSZipUtils from 'jszip-utils';
-import JSZip from 'jszip';
-import axios from 'axios';
+import {getCursorPosition, setCursorPosition, getNextTextNode, getTextNodes, HtmlTag} from "@/utils/tools";
 // @ts-ignore
 import HTMLtoDOCX from 'html-to-docx/dist/html-to-docx.esm'
 
@@ -36,7 +32,7 @@ export default Vue.extend({
   name: 'HelloWorld',
   props: {
     width: String,
-    height: String
+    height: String,
   }
   ,
   mounted() {
@@ -52,6 +48,7 @@ export default Vue.extend({
   ,
   data() {
     return {
+      mxHeight:window.innerHeight+'px',
       html: null as string | null,
       editedHtml: null as string | null,
       isIxbrlTagOptionsBarVisible: false,
@@ -332,6 +329,9 @@ section.docx {
 .ixbrl-editor-header-wrapper {
   width: 100%;
   height: auto;
+}
+.ixbrl-editor-content-wrapper{
+  overflow: auto;
 }
 
 #doc-input {

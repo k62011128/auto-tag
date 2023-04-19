@@ -67,11 +67,6 @@ function setCursorPosition(startContainer: any, startPos: number, endContainer?:
     selection.addRange(range);
 }
 
-// 获取当前选中的文本所在节点
-function setIxbrlTag(): void {
-
-}
-
 //获取下一个文本节点
 function getNextTextNode(node: any,textNodesArr:any): any {
     let nxtPos= textNodesArr.indexOf(node)+1
@@ -129,7 +124,6 @@ function getTextNodes(node: any): any {
 export {
     getCursorPosition,
     setCursorPosition,
-    setIxbrlTag,
     getNextTextNode,
     HtmlTag,
     getTextNodes
