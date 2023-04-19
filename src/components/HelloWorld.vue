@@ -5,6 +5,7 @@
       <button @click="importDocx">导入</button>
       <button @click="exportDocx">导出</button>
       <button @click="markIxbrl">markIxbrl</button>
+      <input :value="inputValue" @input="updateValue"></input>
     </div>
     <div v-html="html" ref="editor" id="doc-input" contenteditable="true" @input="handleInput"></div>
     <!--    <div v-html="html" ref="editor" id="doc-input" @input="handleInput"></div>-->
@@ -58,10 +59,14 @@ export default Vue.extend({
         const textNode = document.createTextNode(span.textContent);
         span.parentNode.replaceChild(textNode, span);
       }],
-      currentDocument: null as any
+      currentDocument: null as any,
+      inputValue:'initial value' as string
     };
   },
   methods: {
+    updateValue(e:any){
+      this.inputValue=e.target.value
+    },
     handleFileSelect(e: any) {
       const file = e.target.files[0]
       this.currentDocument = file;
