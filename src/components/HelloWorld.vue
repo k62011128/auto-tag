@@ -27,6 +27,8 @@ import {getCursorPosition, setCursorPosition, setIxbrlTag, getNextTextNode, getT
 import Docxtemplater from 'docxtemplater';
 // import JSZipUtils from 'jszip-utils';
 import JSZip from 'jszip';
+import axios from 'axios';
+
 
 export default Vue.extend({
   name: 'HelloWorld',
@@ -203,10 +205,38 @@ export default Vue.extend({
         this.optionsHandle[0](item)
       })
       htmlString = htmlDoc.body.innerHTML
+      let se:any=document.querySelector('section.docx')
+      se.innerHTML=htmlString
+
+      let html=new HtmlTag('html')
+      let head=new HtmlTag('head')
+      let body=new HtmlTag('body',{},htmlString)
+      html.add(head)
+      html.add(body)
+      htmlString=html.value
       // console.log(htmlDoc.body)
+      //下载html
+      const blob = new Blob([htmlString], { type: 'text/html' });
+      const formData = new FormData();
+      formData.append('htmlFile', blob, 'myPage.html');
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'myPage.html';
+      document.body.appendChild(link);
+      link.click();
+      return//发请求
+      axios.defaults.baseURL = 'https://example.com';
+      axios.post('/uploadHtmlFile', formData)
+          .then(response => {
+            console.log(response);
+          })
+          .catch(error => {
+            console.log(error);
+          });
       return
-      const blob: any = htmlDocx.asBlob(htmlString);
-      FileSaver.saveAs(blob, `新建文档.docx`)
+      const blob2: any = htmlDocx.asBlob(htmlString);
+      FileSaver.saveAs(blob2, `新建文档.docx`)
     },
     markIxbrl() {
       let {startContainer, start, endContainer, end} = getCursorPosition();
