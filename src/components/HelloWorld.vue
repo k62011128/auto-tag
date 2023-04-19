@@ -189,8 +189,8 @@ export default Vue.extend({
           // 阻止事件冒泡
           e.stopPropagation();
           _this.ixbrlTag = item
-          bar.style.left = e.pageX + 'px'
-          bar.style.top = e.pageY + 'px'
+          bar.style.left = e.x + 10 + 'px'
+          bar.style.top = e.y + 10 + 'px'
           _this.isIxbrlTagOptionsBarVisible = true
         })
       })
@@ -220,7 +220,7 @@ export default Vue.extend({
       html.add(head)
       html.add(body)
       htmlString = html.value
-      this.Export2Word(htmlString,'test')
+      this.Export2Word(htmlString, 'test')
       // return
       //做成html文件
       // const blob = new Blob([htmlString], {type: 'text/html'});
@@ -237,7 +237,7 @@ export default Vue.extend({
       //       console.log(error);
       //     });
     },
-    async Export2Word(htmlString:string, filename = '') {
+    async Export2Word(htmlString: string, filename = '') {
       const fileBuffer = await HTMLtoDOCX(htmlString);
       const url = URL.createObjectURL(fileBuffer);
       const a = document.createElement('a');
@@ -266,8 +266,8 @@ export default Vue.extend({
           // 阻止事件冒泡
           e.stopPropagation();
           _this.ixbrlTag = span
-          bar.style.left = e.pageX + 'px'
-          bar.style.top = e.pageY + 'px'
+          bar.style.left = e.x + 10 + 'px'
+          bar.style.top = e.y + 10 + 'px'
           _this.isIxbrlTagOptionsBarVisible = true
         })
         // 将<span>标签插入到文本范围内
