@@ -5,7 +5,14 @@ module.exports = {
     // ...
     resolve: {
         fallback: {
-            "fs": false
+            "fs": false,
+            "zlib": require.resolve("browserify-zlib"),
+            "https": require.resolve("https-browserify"),
+            "url": require.resolve("url/"),
+            "http": require.resolve("stream-http"),
+            "stream": require.resolve("stream-browserify"),
+            "crypto": require.resolve("crypto-browserify"),
+            "assert": require.resolve("assert/")
         },
         // alias: {
         //     'polyfill-library': 'polyfill-library/dist/polyfill.min.js'

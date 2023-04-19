@@ -29,7 +29,8 @@ import Docxtemplater from 'docxtemplater';
 // import JSZipUtils from 'jszip-utils';
 import JSZip from 'jszip';
 import axios from 'axios';
-
+// @ts-ignore
+import HTMLtoDOCX from 'html-to-docx/dist/html-to-docx.esm'
 
 export default Vue.extend({
   name: 'HelloWorld',
@@ -60,12 +61,12 @@ export default Vue.extend({
         span.parentNode.replaceChild(textNode, span);
       }],
       currentDocument: null as any,
-      inputValue:'initial value' as string
+      inputValue: 'initial value' as string
     };
   },
   methods: {
-    updateValue(e:any){
-      this.inputValue=e.target.value
+    updateValue(e: any) {
+      this.inputValue = e.target.value
     },
     handleFileSelect(e: any) {
       const file = e.target.files[0]
@@ -109,12 +110,12 @@ export default Vue.extend({
     },
     displayResult(): any {
       // let articleBox:any = new HtmlTag('div',{},document.querySelector('section.docx')?.innerHTML)
-      let articleBox:any = document.querySelector('section.docx')?.innerHTML
+      let articleBox: any = document.querySelector('section.docx')?.innerHTML
       if (!articleBox)
         return
       // const serializer = new XMLSerializer();
       // const articleContent = serializer.serializeToString(article);
-      let htmlString:any = articleBox
+      let htmlString: any = articleBox
       // console.log(htmlString)
       // return
       // console.log(document.querySelector('#doc-input'))
@@ -126,12 +127,12 @@ export default Vue.extend({
       // console.log(htmlValue)
       const parser = new DOMParser();
       const htmlDoc = parser.parseFromString(htmlString, 'text/html');
-      let spanArr=htmlDoc.querySelectorAll('span')
-      for(let i=0;i<spanArr.length;i++){
+      let spanArr = htmlDoc.querySelectorAll('span')
+      for (let i = 0; i < spanArr.length; i++) {
         this.optionsHandle[0](spanArr[i])//把span全换成textNode
       }
       // console.log(htmlDoc)
-      htmlDoc.body.innerHTML=htmlDoc.body.innerHTML//连接连续的textNode
+      htmlDoc.body.innerHTML = htmlDoc.body.innerHTML//连接连续的textNode
       // console.log(htmlDoc.body)
       // return
       let textNodes = getTextNodes(htmlDoc.body)
@@ -173,8 +174,8 @@ export default Vue.extend({
       htmlString = htmlString.replace(/\(\{\(/g, '')
       htmlString = htmlString.replace(/\)\}\)\(ixbrlTag\)/g, '')
       // console.log(htmlString)
-      let se:any=document.querySelector('section.docx')
-      se.innerHTML=htmlString
+      let se: any = document.querySelector('section.docx')
+      se.innerHTML = htmlString
       // console.log(htmlString)
       // this.html = htmlString
     },
@@ -199,8 +200,8 @@ export default Vue.extend({
 
     },
     exportDocx() {
-      let htmlString:any =document.querySelector('section.docx')?.innerHTML
-      if(!htmlString)
+      let htmlString: any = document.querySelector('section.docx')?.innerHTML
+      if (!htmlString)
         return
       const parser = new DOMParser();
       const htmlDoc = parser.parseFromString(htmlString, 'text/html');
@@ -210,38 +211,41 @@ export default Vue.extend({
         this.optionsHandle[0](item)
       })
       htmlString = htmlDoc.body.innerHTML
-      let se:any=document.querySelector('section.docx')
-      se.innerHTML=htmlString
-
-      let html=new HtmlTag('html')
-      let head=new HtmlTag('head')
-      let body=new HtmlTag('body',{},htmlString)
+      //输出前预处理
+      // let se: any = document.querySelector('section.docx')
+      // se.innerHTML = htmlString
+      let html = new HtmlTag('html')
+      let head = new HtmlTag('head')
+      let body = new HtmlTag('body', {}, htmlString)
       html.add(head)
       html.add(body)
-      htmlString=html.value
-      // console.log(htmlDoc.body)
-      //下载html
-      const blob = new Blob([htmlString], { type: 'text/html' });
-      const formData = new FormData();
-      formData.append('htmlFile', blob, 'myPage.html');
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'myPage.html';
-      document.body.appendChild(link);
-      link.click();
-      return//发请求
-      axios.defaults.baseURL = 'https://example.com';
-      axios.post('/uploadHtmlFile', formData)
-          .then(response => {
-            console.log(response);
-          })
-          .catch(error => {
-            console.log(error);
-          });
-      return
-      const blob2: any = htmlDocx.asBlob(htmlString);
-      FileSaver.saveAs(blob2, `新建文档.docx`)
+      htmlString = html.value
+      this.Export2Word(htmlString,'test')
+      // return
+      //做成html文件
+      // const blob = new Blob([htmlString], {type: 'text/html'});
+      // const formData = new FormData();
+      // formData.append('htmlFile', blob, 'myPage.html');
+      // return
+      //发请求
+      // axios.defaults.baseURL = 'https://example.com';
+      // axios.post('/uploadHtmlFile', formData)
+      //     .then(response => {
+      //       console.log(response);
+      //     })
+      //     .catch(error => {
+      //       console.log(error);
+      //     });
+    },
+    async Export2Word(htmlString:string, filename = '') {
+      const fileBuffer = await HTMLtoDOCX(htmlString);
+      const url = URL.createObjectURL(fileBuffer);
+      const a = document.createElement('a');
+      a.href = url;
+      // Specify file name
+      filename = filename ? filename + '.docx' : 'document.docx';
+      a.download = filename;
+      a.click();
     },
     markIxbrl() {
       let {startContainer, start, endContainer, end} = getCursorPosition();
