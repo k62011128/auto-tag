@@ -48,7 +48,7 @@ export default Vue.extend({
   ,
   data() {
     return {
-      mxHeight:window.innerHeight+'px',
+      mxHeight: window.innerHeight + 'px',
       html: null as string | null,
       editedHtml: null as string | null,
       isIxbrlTagOptionsBarVisible: false,
@@ -88,7 +88,7 @@ export default Vue.extend({
         ignoreFonts: false, //disables fonts rendering
         breakPages: true, //enables page breaking on page breaks
         ignoreLastRenderedPageBreak: true, //disables page breaking on lastRenderedPageBreak elements
-        experimental: false, //enables experimental features (tab stops calculation)
+        experimental: true, //enables experimental features (tab stops calculation)
         trimXmlDeclaration: true, //if true, xml declaration will be removed from xml documents before parsing
         useBase64URL: false, //if true, images, fonts, etc. will be converted to base 64 URL, otherwise URL.createObjectURL is used
         useMathMLPolyfill: false, //includes MathML polyfills for chrome, edge, etc.
@@ -103,7 +103,8 @@ export default Vue.extend({
             // renderThumbnails(container, document.querySelector("#thumbnails-container"));
             console.log('ok');
             this.displayResult()
-          }).then(_this.setEventListener);
+          })
+          .then(_this.setEventListener);
     },
     displayResult(): any {
       // let articleBox:any = new HtmlTag('div',{},document.querySelector('section.docx')?.innerHTML)
@@ -197,7 +198,11 @@ export default Vue.extend({
 
     },
     exportDocx() {
-      let htmlString: any = document.querySelector('section.docx')?.innerHTML
+      let sections = document.querySelectorAll('section.docx')
+      let htmlString: any = ''
+      for (let i = 0; i < sections.length; i++) {
+        htmlString += sections[i]?.innerHTML
+      }
       if (!htmlString)
         return
       const parser = new DOMParser();
@@ -330,7 +335,8 @@ section.docx {
   width: 100%;
   height: auto;
 }
-.ixbrl-editor-content-wrapper{
+
+.ixbrl-editor-content-wrapper {
   overflow: auto;
 }
 

@@ -1,7 +1,7 @@
 <template>
   <div id="app">
-    <HelloWorld width="100%" height="100%"/>
-<!--    <Editor></Editor>-->
+<!--    <HelloWorld width="100%" height="100%"/>-->
+    <Editor></Editor>
   </div>
 </template>
 

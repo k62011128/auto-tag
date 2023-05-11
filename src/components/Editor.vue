@@ -1,55 +1,82 @@
 <template>
-  <div style="border: 1px solid #ccc;">
-    <Toolbar
-        style="border-bottom: 1px solid #ccc"
-        :editor="editor"
-        :defaultConfig="toolbarConfig"
-        :mode="mode"
-    />
+  <div>
     <Editor
-        style="height: 500px; overflow-y: hidden;"
-        v-model="html"
-        :defaultConfig="editorConfig"
-        :mode="mode"
-        @onCreated="onCreated"
-    />
+        api-key="s5dxut3o71yf2okicziqqf6w0pwduc8fzrrwy7q9pqj1v7wh"
+        v-model="content"
+        ref="editor"
+        @onChange="onChange"
+        :init="init"
+    >
+    </Editor>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
+import Editor from '@tinymce/tinymce-vue'
 
 export default Vue.extend({
-  components: { Editor, Toolbar },
+  components: {Editor},
   data() {
     return {
-      editor: null as any,
-      html: '<p>hello</p>',
-      toolbarConfig: { },
-      editorConfig: { placeholder: '请输入内容...' },
-      mode: 'default', // or 'simple'
+      content: "",
+      init: {},
+      editor: null as any
     }
   },
   methods: {
-    onCreated(editor:any) {
-      this.editor = Object.seal(editor) // 一定要用 Object.seal() ，否则会报错
+    onChange(e:any) {
+      this.$emit('changeContent', this.content)
     },
   },
   mounted() {
-    // 模拟 ajax 请求，异步渲染编辑器
-    setTimeout(() => {
-      this.html = '<p>模拟 Ajax 异步设置内容 HTML</p>'
-    }, 1500)
+
   },
-  beforeDestroy() {
-    const editor:any = this.editor
-    if (editor == null) return
-    editor.destroy() // 组件销毁时，及时销毁编辑器
+  created() {
+    const that:any = this;
+    this.init = {
+      height: 800,
+      toolbar: 'undo redo | markIxbrlTag',
+      menu: {//自定义菜单
+        my1: {title: 'File', items: 'import export'}
+      },
+      menubar: 'my1',
+      setup: (editor:any) => {
+        // console.log(editor)
+        // console.log(editor.iframeElement)
+        editor.ui.registry.addButton('markIxbrlTag', {
+          text: 'MarkIxbrl',
+          // icon: "horizontal-rule",//显示在编辑器上的icon
+          onAction: function (_:any) {
+            const selectedText = editor.selection.getContent({ format: 'text' })
+            editor.selection.setContent(`<span style="background: yellow">${selectedText}</span>`)
+          },
+        });
+        editor.ui.registry.addMenuItem('import', {
+          text: 'Import',
+          onAction: function() {
+              console.log('import')
+          }
+        });
+        editor.ui.registry.addMenuItem('export', {
+          text: 'Export',
+          onAction: function() {
+
+          }
+        });
+      },
+    }
   }
 })
 </script>
 
 <style scoped>
-
+@media (min-width: 1024px) {
+  #sample {
+    display: flex;
+    flex-direction: column;
+    place-items: center;
+    width: 1000px;
+  }
+}
 </style>

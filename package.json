@@ -7,6 +7,7 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "@tinymce/tinymce-vue": "^3.2.8",
     "@wangeditor/editor": "^5.1.23",
     "@wangeditor/editor-for-vue": "^1.0.2",
     "@xmldom/xmldom": "^0.8.6",
@@ -33,6 +34,7 @@
     "path-is-absolute": "^1.0.0",
     "stream-browserify": "^3.0.0",
     "stream-http": "^3.2.0",
+    "tinymce": "^6.4.2",
     "underscore": "^1.13.1",
     "url": "^0.11.0",
     "util": "^0.12.5",
