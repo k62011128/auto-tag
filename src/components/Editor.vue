@@ -73,6 +73,7 @@ export default Vue.extend({
         editor.ui.registry.addButton('markIxbrlTag', {
           text: 'MarkIxbrl',
           // icon: "horizontal-rule",//显示在编辑器上的icon
+
           onAction: function (_: any) {
             const selectedText = editor.selection.getContent({format: 'text'})
             editor.selection.setContent(`<span style="background: yellow">${selectedText}</span>`)
