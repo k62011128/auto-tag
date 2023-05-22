@@ -102,6 +102,23 @@ export default Vue.extend({
       spanElement.innerText = selectedText
       rng.deleteContents()
       rng.insertNode(spanElement)
+    },
+    preorderTraversal(node: any, range: any, startNode: any, endNode: any) {
+      if (!node || node === startNode || node === endNode) {
+        return; // 终止条件：节点为空
+      }
+      // 处理当前节点
+      // console.log(node);
+      var isNodeInRange = range.isPointInRange(node, 0);
+      // console.log(isNodeInRange)
+      if (isNodeInRange && node.nodeType === 1 && node.tagName.toLowerCase() === 'span') {
+        node.style.backgroundColor = 'yellow'
+        node.setAttribute('tag-text', range.toString())
+      }
+      // console.log(node.childNodes)
+      for (let i = 0; i < node.childNodes.length; i++) {
+        this.preorderTraversal(node.childNodes[i], range, startNode, endNode);
+      }
     }
   },
   mounted() {
@@ -157,13 +174,13 @@ export default Vue.extend({
             } else {
               let selRange = editor.selection.getRng()
               let textContent = selRange.toString()
+              //将选区中间的span背景色改黄
+              _this.preorderTraversal(parentNode, selRange, startNode, endNode)
               //替换首部节点中被选中内容
               let textNode = startNode.firstChild;
               _this.changeSpanRng(startNode, selRange.startOffset, textNode.textContent.length, textContent)
               //替换尾部节点被选中内容
               _this.changeSpanRng(endNode, 0, selRange.endOffset, textContent)
-              //将选区涉及到的span背景色改黄
-
             }
             // let bar: any = _this.$refs.optionsBar
             // const iframe = _this.editor.iframeElement
