@@ -22,6 +22,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import Editor from '@tinymce/tinymce-vue'
+import tinymce from 'tinymce'
 
 export default Vue.extend({
   components: {Editor},
@@ -32,8 +33,10 @@ export default Vue.extend({
       editor: null as any,
       isIxbrlTagOptionsBarVisible: false,
       optionsHandle: [(span: any) => {
-        const textNode = document.createTextNode(span.textContent);
-        span.parentNode.replaceChild(textNode, span);
+        // const textNode = document.createTextNode(span.textContent);
+        // span.parentNode.replaceChild(textNode, span);
+        span.classList.remove('ixbrlTag')
+        span.style.backgroundColor = ''
       }],
     }
   },
@@ -49,14 +52,18 @@ export default Vue.extend({
     handleFileSelect2(e: any) {//将传入的html文件解析到iframe中
       const file = e.target.files[0]
       const iframe = this.editor.iframeElement
+      const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+      // console.log(iframeDocument.head)
+      // console.log(iframeDocument.body.attributes)
+      // let attributes= iframeDocument.body.attributes
+      // return
       const reader = new FileReader();
       reader.onload = function () {
-        const fileContent:any = reader.result;
-        const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+        const fileContent: any = reader.result;
         //改body属性再导入iframe
         const parser = new DOMParser();
-        const htmlDoc:any = parser.parseFromString(fileContent, 'text/html');
-        htmlDoc.body.contentEditable=true
+        const htmlDoc: any = parser.parseFromString(fileContent, 'text/html');
+        htmlDoc.body.contentEditable = true
         iframeDocument.documentElement.innerHTML = htmlDoc.querySelector('html').outerHTML;
       };
       reader.readAsText(file);
@@ -74,6 +81,27 @@ export default Vue.extend({
       const iframeDocument = iframe.contentDocument || iframe.contentWindow.document
       const htmlContent = iframeDocument.documentElement.outerHTML;
       console.log(htmlContent)
+    },
+    changeSpanRng(spanNode: any, startOffset: any, endOffset: any, text: any) {
+      let rng = document.createRange();
+      let textNode = spanNode.firstChild;
+      rng.setStart(textNode, startOffset);
+      rng.setEnd(textNode, endOffset);
+      const selectedText = rng.toString()
+      let spanClass = 'ixbrlTag', spanStyle = 'background-color: yellow;'
+      if (spanNode.tagName.toLowerCase() === 'span') {
+        for (let i = 1; i < spanNode.classList.length; i++) {
+          spanClass += ' ' + spanNode.classList[i]
+        }
+        spanStyle += spanNode.getAttribute('style') === null ? '' : spanNode.getAttribute('style')
+      }
+      let spanElement = document.createElement('span');
+      spanElement.setAttribute('class', spanClass);
+      spanElement.setAttribute('style', spanStyle);
+      spanElement.setAttribute('tag-text', text);
+      spanElement.innerText = selectedText
+      rng.deleteContents()
+      rng.insertNode(spanElement)
     }
   },
   mounted() {
@@ -84,9 +112,9 @@ export default Vue.extend({
     //     _this.isIxbrlTagOptionsBarVisible=false
     //   }
     // });
-    window.addEventListener('click',(e:any)=>{
-      if(this.isIxbrlTagOptionsBarVisible){
-        this.isIxbrlTagOptionsBarVisible=false
+    window.addEventListener('click', (e: any) => {
+      if (this.isIxbrlTagOptionsBarVisible) {
+        this.isIxbrlTagOptionsBarVisible = false
       }
     })
   },
@@ -94,7 +122,7 @@ export default Vue.extend({
     const _this: any = this
     this.init = {
       height: 800,
-      toolbar: 'undo redo | markIxbrlTag | test',
+      toolbar: 'markIxbrlTag | test',
       menu: {//自定义菜单
         my1: {title: 'File', items: 'importDocx importHtml export'}
       },
@@ -107,29 +135,86 @@ export default Vue.extend({
           text: 'MarkIxbrl',
           // icon: "horizontal-rule",//显示在编辑器上的icon
           onAction: function (_: any) {
-            const selectedText = editor.selection.getContent({format: 'text'})
-            editor.selection.setContent(`<span style="background: yellow" class="ixbrlTag">${selectedText}</span>`)
-            // console.log(editor.selection.getEnd())
-            let node = editor.selection.getEnd()
-            let bar: any = _this.$refs.optionsBar
-            const iframe = _this.editor.iframeElement
-            node.addEventListener('click', (e: any) => {
-              // 阻止事件冒泡
-              e.stopPropagation();
-              var iframeRect = iframe.getBoundingClientRect();
-              // console.log(e.x + iframeRect.left)
-              // console.log(e.y + iframeRect.top)
-              // console.log(e.x, e.y)
-              bar.style.left = e.x + iframeRect.left + 5 + 'px'
-              bar.style.top = e.y + iframeRect.top + 5 + 'px'
-              _this.isIxbrlTagOptionsBarVisible = true
-            })
+            let startNode = editor.selection.getStart()
+            let endNode = editor.selection.getEnd()
+            let parentNode = editor.selection.getNode()
+            if (startNode === endNode) {
+              const selectedText = editor.selection.getContent({format: 'text'})
+              let spanClass = 'ixbrlTag', spanStyle = 'background-color: yellow;'
+              if (endNode.tagName.toLowerCase() === 'span') {
+                for (let i = 1; i < endNode.classList.length; i++) {
+                  spanClass += ' ' + endNode.classList[i]
+                }
+                spanStyle += endNode.getAttribute('style') === null ? '' : endNode.getAttribute('style')
+              }
+              // editor.selection.setContent(`<span style="background-color: yellow;${spanStyle}" class="ixbrlTag ${classList}">${selectedText}</span>`)
+              let spanElement = document.createElement('span');
+              spanElement.setAttribute('class', spanClass);
+              spanElement.setAttribute('style', spanStyle);
+              spanElement.setAttribute('tag-text', selectedText);
+              spanElement.innerText = selectedText
+              editor.selection.setNode(spanElement)
+            } else {
+              let selRange = editor.selection.getRng()
+              let textContent = selRange.toString()
+              //替换首部节点中被选中内容
+              let textNode = startNode.firstChild;
+              _this.changeSpanRng(startNode, selRange.startOffset, textNode.textContent.length, textContent)
+              //替换尾部节点被选中内容
+              _this.changeSpanRng(endNode, 0, selRange.endOffset, textContent)
+              //将选区涉及到的span背景色改黄
+
+            }
+            // let bar: any = _this.$refs.optionsBar
+            // const iframe = _this.editor.iframeElement
+
+            // spanElement.addEventListener('click', (e: any) => {
+            //   // 阻止事件冒泡
+            //   e.stopPropagation();
+            //   var iframeRect = iframe.getBoundingClientRect();
+            //   // console.log(e.x + iframeRect.left)
+            //   // console.log(e.y + iframeRect.top)
+            //   // console.log(e.x, e.y)
+            //   bar.style.left = e.x + iframeRect.left + 5 + 'px'
+            //   bar.style.top = e.y + iframeRect.top + 5 + 'px'
+            //   _this.isIxbrlTagOptionsBarVisible = true
+            // })
+
           },
         });
         editor.ui.registry.addButton('test', {
           text: 'test',
           // icon: "horizontal-rule",//显示在编辑器上的icon
           onAction: function (_: any) {
+            console.log(editor.selection)
+            let startNode = editor.selection.getStart()
+            let endNode = editor.selection.getEnd()
+            let parentNode = editor.selection.getNode()
+            let rng = editor.selection.getRng()
+
+            console.log(rng)
+            const iframe = _this.editor.iframeElement
+            const iframeDocument = iframe.contentDocument || iframe.contentWindow.document
+            let sel = iframeDocument.getSelection();
+            console.log(sel)
+            let range = sel.getRangeAt(0);
+            console.log(range)
+            return
+
+            let selectedNodes = [];
+            let nodeIterator = document.createNodeIterator(range.commonAncestorContainer, NodeFilter.SHOW_ELEMENT);
+
+            let currentNode;
+            while (currentNode = nodeIterator.nextNode()) {
+              if (range.intersectsNode(currentNode)) {
+                selectedNodes.push(currentNode);
+              }
+            }
+            // console.log(selectedNodes)
+            selectedNodes.forEach(function (node: any) {
+              node.style.backgroundColor = "yellow";
+            });
+            return
             const selectedText = editor.selection.getContent({format: 'text'})
             console.log(editor.selection.getContent({format: 'text'}))//文本
             console.log(editor.selection.getEnd())//尾部所在node
